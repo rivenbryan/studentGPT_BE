@@ -78,7 +78,6 @@ const uploadImageToCloudinary = async (buffer, res) => {
 };
 
 const getOcrText = async (imageUrl, fileType) => {
-    console.log("first" + imageUrl)
     const ocrApiUrl = 'https://api.ocr.space/parse/image';
     
     // Create a FormData object and append the necessary fields
@@ -88,7 +87,6 @@ const getOcrText = async (imageUrl, fileType) => {
     formData.append('url', imageUrl);
     formData.append('iscreatesearchablepdf', 'false');
     formData.append('issearchablepdfhidetextlayer', 'false');
-    console.log("second" + imageUrl)
     if (fileType) {
       formData.append('filetype', fileType);
     }
@@ -120,6 +118,7 @@ const sendImageToChatGPT = async (req, res) => {
 
          /* Function to send the URL to OCR */
         const message = await getOcrText(urlFromCloudinary);
+        console.log(message)
         console.log("Finished second function\n" + message.ParsedResults[0].ParsedText);
 
         /* If everything is successfully send this back to main function */
