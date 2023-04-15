@@ -114,7 +114,7 @@ const compressImage = async (inputBuffer) => {
 
         // Compress the image using the rotated buffer
         const compressedImageBuffer = await sharp(rotatedImageBuffer)
-            .jpeg({ quality: 70 }) // Adjust the quality parameter for desired compression level (0-100)
+            .jpeg({ quality: 60 }) // Adjust the quality parameter for desired compression level (0-100)
             .toBuffer();
 
         return compressedImageBuffer;
