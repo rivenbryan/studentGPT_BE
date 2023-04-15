@@ -5,7 +5,7 @@ const cloudinary = require('../utils/cloudinary')
 const axios = require('axios');
 const FormData = require('form-data');
 
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: '.env' });
 
 const sendChatMessage = async (req, res) => {
     const configuration = new Configuration({
