@@ -2,6 +2,7 @@ const express = require('express');
 const app = express()
 const bodyParser = require('body-parser');
 const chatGPT_router = require("./routes/chatGPT_route")
+require('dotenv').config({ path: '.env' });
 var cors = require('cors')
 
 
@@ -34,7 +35,7 @@ app.get('/', (req, res) => {
 /*
 * Listening to port
 */
-const port = 5000; // or any other port number you want to use
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on port`);
 });
