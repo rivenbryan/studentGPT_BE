@@ -107,34 +107,42 @@ const getOcrText = async (imageUrl, fileType) => {
     }
   };
 
-const compressImage = async (inputBuffer) => {
+  const compressImage = async (inputBuffer) => {
     try {
-      // Compress the image using the input buffer
-      const compressedImageBuffer = await sharp(inputBuffer)
-        .jpeg({ quality: 50 }) // Adjust the quality parameter for desired compression level (0-100)
-        .toBuffer();
-  
-      return compressedImageBuffer;
+        // Read and rotate the image based on its Exif metadata
+        const rotatedImageBuffer = await sharp(inputBuffer)
+            .rotate() // This line reads the Exif orientation and rotates the image accordingly
+            .toBuffer();
+
+        // Compress the image using the rotated buffer
+        const compressedImageBuffer = await sharp(rotatedImageBuffer)
+            .jpeg({ quality: 50 }) // Adjust the quality parameter for desired compression level (0-100)
+            .toBuffer();
+
+        return compressedImageBuffer;
     } catch (error) {
-      console.error('Error compressing image:', error);
-      throw error;
+        console.error('Error compressing image:', error);
+        throw error;
     }
-  };
+};
+
 const sendImageToChatGPT = async (req, res) => {
     const fileType = req.file.mimetype
     console.log(fileType)
 
     try {
+        /* Function to compress image */
         const compressedBuffer = await compressImage(req.file.buffer)
+        console.log("Finished first function\n");
         /* Function to send image to cloudinary*/
         const urlFromCloudinary = await uploadImageToCloudinary(compressedBuffer, res);
-        console.log("Finished first function\n" + urlFromCloudinary);
+        console.log("Finished second function\n" + urlFromCloudinary);
 
 
          /* Function to send the URL to OCR */
         const message = await getOcrText(urlFromCloudinary);
         console.log(message)
-        console.log("Finished second function\n" + message.ParsedResults[0].ParsedText);
+        console.log("Finished third function\n" + message.ParsedResults[0].ParsedText);
 
         /* If everything is successfully send this back to main function */
         res.send(message.ParsedResults[0].ParsedText)
