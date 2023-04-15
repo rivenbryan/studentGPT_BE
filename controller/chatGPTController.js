@@ -3,6 +3,7 @@
 const { Configuration, OpenAIApi } = require("openai");
 const cloudinary = require('../utils/cloudinary')
 const axios = require('axios');
+const sharp = require('sharp');
 const FormData = require('form-data');
 
 require('dotenv').config({ path: '.env' });
@@ -106,15 +107,29 @@ const getOcrText = async (imageUrl, fileType) => {
     }
   };
 
+const compressImage = async (inputBuffer) => {
+    try {
+      // Compress the image using the input buffer
+      const compressedImageBuffer = await sharp(inputBuffer)
+        .jpeg({ quality: 50 }) // Adjust the quality parameter for desired compression level (0-100)
+        .toBuffer();
   
+      return compressedImageBuffer;
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      throw error;
+    }
+  };
 const sendImageToChatGPT = async (req, res) => {
     const fileType = req.file.mimetype
     console.log(fileType)
 
     try {
+        const compressedBuffer = await compressImage(req.file.buffer)
         /* Function to send image to cloudinary*/
-        const urlFromCloudinary = await uploadImageToCloudinary(req.file.buffer, res);
+        const urlFromCloudinary = await uploadImageToCloudinary(compressedBuffer, res);
         console.log("Finished first function\n" + urlFromCloudinary);
+
 
          /* Function to send the URL to OCR */
         const message = await getOcrText(urlFromCloudinary);
