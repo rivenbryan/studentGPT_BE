@@ -26,6 +26,11 @@ app.use((req, res, next)=> {
 */
 app.use('/api', chatGPT_router)
 
+// Other routes and middlewares
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
 /*
 * Listening to port
 */
