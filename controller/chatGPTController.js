@@ -53,7 +53,7 @@ const sendGenerateImage = async (req, res) => {
     }
 }
 
-const uploadImageToCloudinary = async (buffer) => {
+const uploadImageToCloudinary = async (buffer, res) => {
     try {
         const result = await new Promise((resolve, reject) => {
             cloudinary.uploader.upload_stream(
@@ -72,13 +72,14 @@ const uploadImageToCloudinary = async (buffer) => {
         });
         return result.secure_url;
     } catch (error) {
+        console.log("is it here")
         throw error;
     }
 };
 
 const getOcrText = async (imageUrl, fileType) => {
     const ocrApiUrl = 'https://api.ocr.space/parse/image';
-  
+    
     // Create a FormData object and append the necessary fields
     const formData = new FormData();
     formData.append('language', 'eng');
@@ -86,7 +87,7 @@ const getOcrText = async (imageUrl, fileType) => {
     formData.append('url', imageUrl);
     formData.append('iscreatesearchablepdf', 'false');
     formData.append('issearchablepdfhidetextlayer', 'false');
-  
+    
     if (fileType) {
       formData.append('filetype', fileType);
     }
@@ -108,11 +109,12 @@ const getOcrText = async (imageUrl, fileType) => {
 
   
 const sendImageToChatGPT = async (req, res) => {
-    console.log(req.file)
+    const fileType = req.file.mimetype
+    console.log(fileType)
 
     try {
         /* Function to send image to cloudinary*/
-        const urlFromCloudinary = await uploadImageToCloudinary(req.file.buffer);
+        const urlFromCloudinary = await uploadImageToCloudinary(req.file.buffer, res);
         console.log("Finished first function\n" + urlFromCloudinary);
 
          /* Function to send the URL to OCR */
