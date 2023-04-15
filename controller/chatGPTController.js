@@ -1,5 +1,3 @@
-
-
 const { Configuration, OpenAIApi } = require("openai");
 const cloudinary = require('../utils/cloudinary')
 const axios = require('axios');
@@ -107,7 +105,7 @@ const getOcrText = async (imageUrl, fileType) => {
     }
   };
 
-  const compressImage = async (inputBuffer) => {
+const compressImage = async (inputBuffer) => {
     try {
         // Read and rotate the image based on its Exif metadata
         const rotatedImageBuffer = await sharp(inputBuffer)
@@ -116,7 +114,7 @@ const getOcrText = async (imageUrl, fileType) => {
 
         // Compress the image using the rotated buffer
         const compressedImageBuffer = await sharp(rotatedImageBuffer)
-            .jpeg({ quality: 50 }) // Adjust the quality parameter for desired compression level (0-100)
+            .jpeg({ quality: 70 }) // Adjust the quality parameter for desired compression level (0-100)
             .toBuffer();
 
         return compressedImageBuffer;
@@ -131,13 +129,13 @@ const sendImageToChatGPT = async (req, res) => {
     console.log(fileType)
 
     try {
-        /* Function to compress image */
+        /* Function to compress image and rotate image accordingly */
         const compressedBuffer = await compressImage(req.file.buffer)
         console.log("Finished first function\n");
+
         /* Function to send image to cloudinary*/
         const urlFromCloudinary = await uploadImageToCloudinary(compressedBuffer, res);
         console.log("Finished second function\n" + urlFromCloudinary);
-
 
          /* Function to send the URL to OCR */
         const message = await getOcrText(urlFromCloudinary);
@@ -146,6 +144,7 @@ const sendImageToChatGPT = async (req, res) => {
 
         /* If everything is successfully send this back to main function */
         res.send(message.ParsedResults[0].ParsedText)
+
     } catch (error) {
         console.error('Error uploading image:', error);
         res.status(500).json({ error: 'Error uploading image' });
