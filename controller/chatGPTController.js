@@ -78,6 +78,7 @@ const uploadImageToCloudinary = async (buffer, res) => {
 };
 
 const getOcrText = async (imageUrl, fileType) => {
+    console.log("first" + imageUrl)
     const ocrApiUrl = 'https://api.ocr.space/parse/image';
     
     // Create a FormData object and append the necessary fields
@@ -87,7 +88,7 @@ const getOcrText = async (imageUrl, fileType) => {
     formData.append('url', imageUrl);
     formData.append('iscreatesearchablepdf', 'false');
     formData.append('issearchablepdfhidetextlayer', 'false');
-    
+    console.log("second" + imageUrl)
     if (fileType) {
       formData.append('filetype', fileType);
     }
