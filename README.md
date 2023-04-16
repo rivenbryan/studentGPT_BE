@@ -49,13 +49,12 @@ Cloudinary API
 OCR API
 Once you have the API keys, create a .env file in the root directory of the project and add the following variables:
 
-makefile
-Copy code
-CHATGPT_API_KEY=your_chatgpt_api_key
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-OCR_API_KEY=your_ocr_api_key
-Replace your_*_api_key and your_cloudinary_api_secret with the actual keys and secret obtained from the respective services.
+
+- CHATGPT_API_KEY=your_chatgpt_api_key
+- CLOUDINARY_API_KEY=your_cloudinary_api_key
+- CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+- OCR_API_KEY=your_ocr_api_key
+- Replace your_*_api_key and your_cloudinary_api_secret with the actual keys and secret obtained from the respective services.
 
 ### Contributing
 We welcome contributions to the ChatGPT-Clone project! Please feel free to submit issues, feature requests, or pull requests. If you need any help, please reach out to me.
