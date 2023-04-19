@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(cors())
 
-app.use((req, res, next)=> {
+app.use((req, res, next) => {
   console.log(req.path, req.method)
   next()
 })
@@ -36,6 +36,6 @@ app.get('/', (req, res) => {
 * Listening to port
 */
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port`);
 });

@@ -78,7 +78,7 @@ const uploadImageToCloudinary = async (buffer, res) => {
 
 const getOcrText = async (imageUrl, fileType) => {
     const ocrApiUrl = 'https://api.ocr.space/parse/image';
-    
+
     // Create a FormData object and append the necessary fields
     const formData = new FormData();
     formData.append('language', 'eng');
@@ -87,34 +87,57 @@ const getOcrText = async (imageUrl, fileType) => {
     formData.append('iscreatesearchablepdf', 'false');
     formData.append('issearchablepdfhidetextlayer', 'false');
     if (fileType) {
-      formData.append('filetype', fileType);
+        formData.append('filetype', fileType);
     }
-  
-    try {
-      const response = await axios.post(ocrApiUrl, formData, {
-        headers: {
-          apikey: process.env.OCR_API_KEY,
-          ...formData.getHeaders(),
-        },
-      });
-  
-      return response.data;
-    } catch (error) {
-      console.error('Error getting OCR text:', error);
-      throw error;
-    }
-  };
 
+    try {
+        const response = await axios.post(ocrApiUrl, formData, {
+            headers: {
+                apikey: process.env.OCR_API_KEY,
+                ...formData.getHeaders(),
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Error getting OCR text:', error);
+        throw error;
+    }
+};
+
+
+const qualityOfImage = async (rotatedImageBuffer) => {
+    try {
+        const metadata = await sharp(rotatedImageBuffer).metadata();
+        const sizeOfImage = metadata.size
+        let qualityOfImage
+
+        /* If the size of the file is > 2.4mb */
+        if (sizeOfImage > 2516582) {
+            qualityOfImage = 40
+        } else {
+            qualityOfImage = 70
+        }
+        return qualityOfImage
+    } catch (error) {
+        console.log(error)
+    }
+}
 const compressImage = async (inputBuffer) => {
     try {
+
         // Read and rotate the image based on its Exif metadata
         const rotatedImageBuffer = await sharp(inputBuffer)
             .rotate() // This line reads the Exif orientation and rotates the image accordingly
             .toBuffer();
 
+        // Read the size and return a quantity
+        const qualityOfImageNumber = await qualityOfImage(rotatedImageBuffer)
+        console.log("qualityOfImageNumber is " + qualityOfImageNumber)
+
         // Compress the image using the rotated buffer
         const compressedImageBuffer = await sharp(rotatedImageBuffer)
-            .jpeg({ quality: 45 }) // Adjust the quality parameter for desired compression level (0-100)
+            .jpeg({ quality: 20 }) // Adjust the quality parameter for desired compression level (0-100)
             .toBuffer();
 
         return compressedImageBuffer;
@@ -126,7 +149,6 @@ const compressImage = async (inputBuffer) => {
 
 const sendImageToChatGPT = async (req, res) => {
     const fileType = req.file.mimetype
-    console.log(fileType)
 
     try {
         /* Function to compress image and rotate image accordingly */
@@ -137,9 +159,8 @@ const sendImageToChatGPT = async (req, res) => {
         const urlFromCloudinary = await uploadImageToCloudinary(compressedBuffer, res);
         console.log("Finished second function\n" + urlFromCloudinary);
 
-         /* Function to send the URL to OCR */
+        /* Function to send the URL to OCR */
         const message = await getOcrText(urlFromCloudinary);
-        console.log(message)
         console.log("Finished third function\n" + message.ParsedResults[0].ParsedText);
 
         /* If everything is successfully send this back to main function */
